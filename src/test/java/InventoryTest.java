@@ -34,5 +34,9 @@ public class InventoryTest extends BaseTest{
 
         int productCount = inventoryPage.getProductCount();
         Assert.assertEquals(productCount, 6, "Expected 6 products on inventory page");
+
+
     }
+
+
 }
