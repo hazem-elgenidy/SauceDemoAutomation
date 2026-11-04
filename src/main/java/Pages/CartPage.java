@@ -12,11 +12,12 @@ public class CartPage {
     private WebDriver driver;
 
     // Locators
+    private By cartItems = By.className("cart_item");
     private By cartItemNames = By.className("inventory_item_name");
 
     private By linkedinIcon = By.cssSelector("a[href*='linkedin']");
     private By facebookIcon = By.cssSelector("a[href*='facebook']");
-    private By twitterIcon = By.cssSelector("a[href*='twitter']");
+    private By twitterIcon = By.cssSelector("a[data-test='social-twitter'], a[href*='twitter'], a[href*='x.com']");
 
     public CartPage(WebDriver driver) {
         this.driver = driver;
@@ -24,7 +25,7 @@ public class CartPage {
 
     // ✔ Get number of items
     public int getItemsCount() {
-        return driver.findElements(cartItemNames).size();
+        return driver.findElements(cartItems).size();
     }
 
     // ✔ Get item names list
