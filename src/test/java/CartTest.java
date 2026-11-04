@@ -1,60 +1,72 @@
+import Pages.CartPage;
+import Pages.InventoryPage;
 import Pages.LoginPage;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
+import java.time.Duration;
 import java.util.List;
 
 public class CartTest extends BaseTest {
     LoginPage loginPage;
-    pages.InventoryPage inventoryPage;
-    pages.CartPage cartPage;
+    InventoryPage inventoryPage;
+    CartPage cartPage;
 
+    // Runs after BaseTest.setup(), so every test starts logged in on the inventory page.
     @BeforeMethod
     public void setupPages() {
         loginPage = new LoginPage(driver);
-        inventoryPage = new pages.InventoryPage(driver);
-        cartPage = new pages.CartPage(driver);
-
+        inventoryPage = new InventoryPage(driver);
+        cartPage = new CartPage(driver);
 
         loginPage.login("standard_user", "secret_sauce");
     }
 
-    private void switchToNewTab() {
-        ArrayList<String> tabs = new ArrayList<>(driver.getWindowHandles());
-        driver.switchTo().window(tabs.get(1));
+    /**
+     * Switches to the tab the link just opened, waits for its page to start loading,
+     * returns its URL, then closes it and goes back to the original tab.
+     */
+    private String urlOfNewTab(String originalTab) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        wait.until(d -> d.getWindowHandles().size() > 1);
+        for (String handle : driver.getWindowHandles()) {
+            if (!handle.equals(originalTab)) {
+                driver.switchTo().window(handle);
+                break;
+            }
+        }
+        wait.until(d -> !d.getCurrentUrl().startsWith("about:blank"));
+        String url = driver.getCurrentUrl();
+        driver.close();
+        driver.switchTo().window(originalTab);
+        return url;
     }
 
     @Test
     public void testSocialIcons() {
-        loginPage.login("standard_user", "secret_sauce");
+        String originalTab = driver.getWindowHandle();
 
         // LinkedIn
         inventoryPage.clickLinkedIn();
-        switchToNewTab();
-        Assert.assertTrue(driver.getCurrentUrl().contains("linkedin"));
-        driver.close();
-        driver.switchTo().window(driver.getWindowHandles().iterator().next());
+        String linkedInUrl = urlOfNewTab(originalTab);
+        Assert.assertTrue(linkedInUrl.contains("linkedin"), "Unexpected LinkedIn URL: " + linkedInUrl);
 
         // Facebook
         inventoryPage.clickFacebook();
-        switchToNewTab();
-        Assert.assertTrue(driver.getCurrentUrl().contains("facebook"));
-        driver.close();
-        driver.switchTo().window(driver.getWindowHandles().iterator().next());
+        String facebookUrl = urlOfNewTab(originalTab);
+        Assert.assertTrue(facebookUrl.contains("facebook"), "Unexpected Facebook URL: " + facebookUrl);
 
-        // Twitter
+        // Twitter (twitter.com now redirects to x.com)
         inventoryPage.clickTwitter();
-        switchToNewTab();
-        Assert.assertTrue(driver.getCurrentUrl().contains("x.com"));
-        driver.close();
+        String twitterUrl = urlOfNewTab(originalTab);
+        Assert.assertTrue(twitterUrl.contains("x.com") || twitterUrl.contains("twitter.com"),
+                "Unexpected Twitter/X URL: " + twitterUrl);
     }
 
     @Test
     public void testCartEmpty() {
-        loginPage.login("standard_user", "secret_sauce");
-
         inventoryPage.openCart();
 
         Assert.assertEquals(cartPage.getItemsCount(), 0,
@@ -63,8 +75,6 @@ public class CartTest extends BaseTest {
 
     @Test
     public void testAddThreeProducts() {
-        loginPage.login("standard_user", "secret_sauce");
-
         inventoryPage.addProduct("Sauce Labs Backpack");
         inventoryPage.addProduct("Sauce Labs Bolt T-Shirt");
         inventoryPage.addProduct("Sauce Labs Onesie");
@@ -77,10 +87,9 @@ public class CartTest extends BaseTest {
         Assert.assertTrue(items.contains("Sauce Labs Bolt T-Shirt"));
         Assert.assertTrue(items.contains("Sauce Labs Onesie"));
     }
+
     @Test
     public void testRemoveOneProduct() {
-        loginPage.login("standard_user", "secret_sauce");
-
         inventoryPage.addProduct("Sauce Labs Backpack");
         inventoryPage.addProduct("Sauce Labs Bolt T-Shirt");
         inventoryPage.addProduct("Sauce Labs Onesie");
