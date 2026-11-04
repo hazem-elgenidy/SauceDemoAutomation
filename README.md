@@ -1,274 +1,98 @@
-# 🧪 SauceDemoAutomation
+# SauceDemoAutomation
 
-Professional end-to-end test automation framework for the SauceDemo web application using Selenium WebDriver, TestNG, and the Page Object Model design pattern.
+[![UI tests](https://github.com/hazem-elgenidy/SauceDemoAutomation/actions/workflows/tests.yml/badge.svg)](https://github.com/hazem-elgenidy/SauceDemoAutomation/actions/workflows/tests.yml)
 
-## 📋 Overview
+UI test automation for [saucedemo.com](https://www.saucedemo.com) (the "Swag Labs" demo store), written in **Java** with **Selenium WebDriver** and **TestNG**, structured with the **Page Object Model**, and using **JSON test data** for login scenarios.
 
-This project demonstrates comprehensive automation testing of the SauceDemo e-commerce platform. It showcases best practices in test automation including data-driven testing with JSON, parameterized tests, and structured test case organization.
+The suite runs automatically in headless Chrome with **GitHub Actions** on every push to `main` and every pull request.
 
-## ✨ Features
+## What is tested
 
-- **End-to-End Testing**: Complete user journey automation (login → browse products → add to cart → checkout)
-- **Page Object Model**: Maintainable and scalable test structure with separated page objects
-- **Data-Driven Testing**: JSON-based test data for login credentials and product validation
-- **TestNG Framework**: Advanced test organization with suites, groups, and parameterization
-- **Cross-Browser Ready**: Configured for Chrome; easily extensible to Firefox, Edge, Safari
-- **Error Handling**: Comprehensive assertion validation and exception handling
-- **Professional Reporting**: TestNG-generated HTML reports for test execution results
+8 tests across login, the inventory page and the shopping cart:
 
-## 🎯 Test Coverage
+| Test class | Test | What it checks |
+|---|---|---|
+| `LoginTest` | `verifySuccessfulLogin` | A valid user lands on the inventory page |
+| | `verifyUnsuccessfulLogin` | Invalid credentials show the "Epic sadface" error |
+| | `verifyLoginWithoutPassword` | An empty password shows "Password is required" |
+| `InventoryTest` | `verifyInventoryPageElements` | Page title is "Swag Labs", the cart icon is visible, and 6 products are listed |
+| `CartTest` | `testCartEmpty` | The cart starts empty |
+| | `testAddThreeProducts` | Three added products appear in the cart |
+| | `testRemoveOneProduct` | A product removed in the cart shows "Add to cart" again; the others still show "Remove" |
+| | `testSocialIcons` | The footer LinkedIn, Facebook and Twitter/X links open the right sites in new tabs |
 
-| Module | Test Cases | Status |
-|--------|-----------|--------|
-| Authentication (Login) | 5+ | ✅ |
-| Product Browsing | 4+ | ✅ |
-| Shopping Cart | 3+ | ✅ |
-| Checkout Flow | 3+ | ✅ |
-| **Total** | **15+** | **✅** |
+## Tech stack
 
-## 🛠️ Tech Stack
+| | |
+|---|---|
+| Language | Java 24 |
+| Browser automation | Selenium WebDriver 4.38.0 |
+| Test framework | TestNG 7.10.2 |
+| Build | Maven |
+| Test data | JSON, read with Gson 2.10.1 |
+| CI | GitHub Actions (headless Chrome) |
 
-| Component | Technology |
-|-----------|-----------|
-| **Language** | Java 24 |
-| **Automation Tool** | Selenium WebDriver 4.38.0 |
-| **Testing Framework** | TestNG 7.10.2 |
-| **Build Tool** | Maven 3.6.3+ |
-| **Test Data** | JSON (GSON 2.10.1) |
-| **Design Pattern** | Page Object Model (POM) |
-| **IDE** | IntelliJ IDEA, Eclipse, VS Code |
-
-## 📦 Installation & Setup
-
-### Prerequisites
-- **Java Development Kit (JDK)**: Java 24 or higher
-- **Maven**: 3.6.3 or higher
-- **Google Chrome**: Latest version
-- **ChromeDriver**: Matching your Chrome version ([Download](https://googlechromelabs.github.io/chrome-for-testing/))
-
-### Step 1: Clone the Repository
-```bash
-git clone https://github.com/hazem-elgenidy/SauceDemoAutomation.git
-cd SauceDemoAutomation
-```
-
-### Step 2: Install Dependencies
-```bash
-mvn clean install
-```
-
-### Step 3: Configure ChromeDriver
-**Option A**: Add ChromeDriver to system PATH
-```bash
-# Verify ChromeDriver is in PATH
-chromedriver --version
-```
-
-**Option B**: Update pom.xml with your ChromeDriver path
-```bash
-mvn -Dwebdriver.chrome.driver="C:/path/to/chromedriver.exe" clean test
-```
-
-### Step 4: Run Tests
-```bash
-# Run all tests
-mvn clean test
-
-# Run specific test class
-mvn -Dtest=LoginTest test
-
-# Run tests by group
-mvn -Dtest=*Test -Dgroups="smoke" test
-```
-
-## 🚀 Quick Start Example
-
-```java
-// Example: Login Test using Page Object Model
-@Test
-public void testValidLogin() {
-    LoginPage loginPage = new LoginPage(driver);
-    
-    // Use JSON test data
-    loginPage.login("standard_user", "secret_sauce");
-    
-    // Verify successful login
-    assert driver.getCurrentUrl().contains("inventory");
-}
-```
-
-## 📁 Project Structure
+## Project structure
 
 ```
 SauceDemoAutomation/
-├── pom.xml                          # Maven configuration with dependencies
-├── README.md                        # This file
-├── .gitignore
-├── src/
-│   ├── main/java/
-│   │   ├── pages/                  # Page Object classes
-│   │   │   ├── LoginPage.java
-│   │   │   ├── ProductPage.java
-│   │   │   ├── CartPage.java
-│   │   │   └── CheckoutPage.java
-│   │   ├── utils/                  # Utility classes
-│   │   │   ├── DriverFactory.java  # WebDriver singleton
-│   │   │   └── JsonDataReader.java # JSON test data parser
-│   │   └── config/                 # Configuration files
-│   │       └── AppConfig.java
-│   │
-│   └── test/java/
-│       ├── tests/                  # Test classes
-│       │   ├── LoginTest.java
-│       │   ├── ShoppingTest.java
-│       │   ├── CheckoutTest.java
-│       │   └── BaseTest.java       # Test base class
-│       └── testdata/               # Test data files
-│           └── testData.json
-│
-└── target/                         # Build output & test reports
-    └── surefire-reports/           # TestNG reports (HTML)
+├── pom.xml
+├── .github/workflows/tests.yml     # CI: runs the suite on GitHub Actions
+└── src/
+    ├── main/java/
+    │   ├── Pages/                  # Page Objects
+    │   │   ├── LoginPage.java
+    │   │   ├── InventoryPage.java
+    │   │   └── CartPage.java
+    │   └── Utils/
+    │       └── DataDriven.java     # reads the JSON test data
+    └── test/
+        ├── TestData.json           # login data: valid, invalid, username only
+        └── java/
+            ├── BaseTest.java       # opens a fresh Chrome before each test, closes it after
+            ├── LoginTest.java
+            ├── InventoryTest.java
+            └── CartTest.java
 ```
 
-## 🧪 Test Design Patterns
+## Design notes
 
-### **Page Object Model (POM)**
-Each page of the application has a corresponding Page Object class:
-```java
-public class LoginPage {
-    private WebDriver driver;
-    
-    // Locators
-    private By usernameField = By.id("user-name");
-    private By passwordField = By.id("password");
-    private By loginButton = By.id("login-button");
-    
-    // Methods
-    public void login(String username, String password) {
-        driver.findElement(usernameField).sendKeys(username);
-        driver.findElement(passwordField).sendKeys(password);
-        driver.findElement(loginButton).click();
-    }
-}
-```
+- **Page Object Model:** locators and page actions live in `Pages/`; tests only describe behaviour.
+- **Test isolation:** `BaseTest` starts a new browser before every test (`@BeforeMethod`) and quits it after (`@AfterMethod`), so tests don't depend on each other.
+- **Data-driven login:** credentials come from `src/test/TestData.json`, not from the test code.
+- **CI-ready:** Chrome runs headless automatically on CI (when the `CI` environment variable is set), and Chrome's password-manager pop-ups are disabled so they can't block the tests.
 
-### **Data-Driven Testing with JSON**
-Test data is externalized for easy maintenance:
-```json
-{
-  "users": [
-    {"username": "standard_user", "password": "secret_sauce", "status": "valid"},
-    {"username": "invalid_user", "password": "wrong_pass", "status": "invalid"}
-  ]
-}
-```
+## Running the tests locally
 
-## 📊 Test Execution & Reports
+Requirements: **Java 24+**, **Maven** and **Google Chrome**. Selenium downloads the matching ChromeDriver automatically, so no manual driver setup is needed.
 
-After running tests, view results:
 ```bash
-# Open TestNG HTML report
-target/surefire-reports/index.html
+git clone https://github.com/hazem-elgenidy/SauceDemoAutomation.git
+cd SauceDemoAutomation
+mvn test
 ```
 
-Report includes:
-- ✅ Passed/Failed test counts
-- ⏱️ Execution duration
-- 📈 Test trends
-- 🔍 Detailed step logs
-- 📸 Screenshots (if implemented)
+Run a single class:
 
-## 🔧 Configuration
-
-### Modify Test Properties
-Update `src/main/java/config/AppConfig.java`:
-```java
-public class AppConfig {
-    public static final String APP_URL = "https://www.saucedemo.com";
-    public static final long WAIT_TIME = 10;
-    public static final String BROWSER = "chrome";
-}
-```
-
-### TestNG Groups (Selective Execution)
-```java
-@Test(groups = "smoke")
-public void testLoginSmoke() { ... }
-
-@Test(groups = "regression")
-public void testLoginRegression() { ... }
-```
-
-Run specific group:
 ```bash
-mvn clean test -Dgroups="smoke"
+mvn test -Dtest=LoginTest
 ```
 
-## 📖 Documentation
+Run without opening a browser window:
 
-### Test Case Examples
-| Test ID | Title | Description | Expected Result |
-|---------|-------|-------------|-----------------|
-| TC_001 | Valid Login | Login with correct credentials | User redirected to inventory page |
-| TC_002 | Invalid Login | Login with wrong credentials | Error message displayed |
-| TC_003 | Add to Cart | Add product to cart | Product count increases |
-| TC_004 | Complete Checkout | Complete purchase flow | Order confirmation displayed |
+```bash
+mvn test -Dheadless=true
+```
 
-## 🤝 Contributing
+TestNG reports are written to `target/surefire-reports/`. On GitHub, each CI run also saves them as a downloadable `test-reports` artifact.
 
-We welcome contributions! Follow these steps:
+## Possible next steps
 
-1. **Fork** the repository
-2. **Create a feature branch**:
-   ```bash
-   git checkout -b feature/new-tests
-   ```
-3. **Make your changes** and add tests
-4. **Commit** with clear messages:
-   ```bash
-   git commit -m "Add tests for checkout flow"
-   ```
-5. **Push** to your fork:
-   ```bash
-   git push origin feature/new-tests
-   ```
-6. **Create a Pull Request** with description
+- Checkout flow tests
+- API tests with REST Assured
+- Allure reporting
+- Cross-browser runs (Firefox, Edge)
 
-### Code Style Guidelines
-- Follow Java naming conventions (camelCase for methods/variables, PascalCase for classes)
-- Keep methods small and focused (Single Responsibility Principle)
-- Add meaningful comments for complex logic
-- Use meaningful variable names (avoid x, y, temp)
-- Maintain consistent indentation (4 spaces)
+## Author
 
-## 🐛 Known Issues & Limitations
-
-- Currently supports Chrome browser only (Firefox/Edge support planned)
-- Requires stable internet connection for SauceDemo access
-- No headless browser mode configured (can be added)
-
-## 🚀 Future Enhancements
-
-- [ ] Add Allure reporting for better visualizations
-- [ ] Implement headless browser testing
-- [ ] Add API testing with REST Assured
-- [ ] GitHub Actions CI/CD integration
-- [ ] Multi-browser cross-browser testing
-- [ ] Performance testing capabilities
-- [ ] Video recording of test execution
-
-## 📞 Support & Contact
-
-- **Issues**: Report bugs via GitHub Issues
-- **Questions**: Create a Discussion or reach out via LinkedIn
-- **Author**: Hazem Elgenidy | QA Automation Engineer
-
-## 📜 License
-
-This project is open source and available under the MIT License.
-
----
-
-**Happy Testing! 🎉**
-
-*Last Updated: May 2026*
+Hazem Elgenidy, QA Engineer · [LinkedIn](https://www.linkedin.com/in/hazem-elgenidy-6a7334181)
