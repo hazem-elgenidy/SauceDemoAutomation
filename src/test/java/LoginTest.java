@@ -37,4 +37,20 @@ public class LoginTest extends BaseTest {
         Assert.assertTrue(errorMessage.contains("Epic sadface"), "Expected error message not found.");
     }
 
-   }
+    @Test(description = "Verify Login Without Password")
+    public void verifyLoginWithoutPassword() {
+        JsonObject root = DataDriven.jsonReader();
+        JsonObject validUsernameOnly = root.getAsJsonObject("valid_username_only");
+        String username = validUsernameOnly.get("username").getAsString();
+
+        LoginPage loginPage = new LoginPage(driver);
+
+        loginPage.enterUsername(username);
+        loginPage.enterPassword(""); // leave password empty
+        loginPage.clickLoginButton();
+
+        String error = loginPage.getErrorMessage();
+        Assert.assertTrue(error.toLowerCase().contains("password is required"),
+                "Expected error containing 'Password is required', but got: " + error);
+    }
+}

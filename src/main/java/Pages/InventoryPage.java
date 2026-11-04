@@ -1,4 +1,4 @@
-package pages;
+package Pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -8,10 +8,24 @@ public class InventoryPage {
     private WebDriver driver;
 
     private By cartIcon = By.id("shopping_cart_container");
-    private By backButton = By.id("back-to-products");
+    private By continueShoppingButton = By.id("continue-shopping");
+    private By inventoryItems = By.className("inventory_item");
 
     public InventoryPage(WebDriver driver) {
         this.driver = driver;
+    }
+
+    // ✔ Page checks used by InventoryTest
+    public String getPageTitle() {
+        return driver.getTitle();
+    }
+
+    public boolean isCartIconDisplayed() {
+        return driver.findElement(cartIcon).isDisplayed();
+    }
+
+    public int getProductCount() {
+        return driver.findElements(inventoryItems).size();
     }
 
     // ✔ Open cart
@@ -40,9 +54,9 @@ public class InventoryPage {
         ).getText();
     }
 
-    // ✔ Go back from cart to inventory
+    // ✔ Go back from cart to inventory ("Continue Shopping" on the cart page)
     public void goBack() {
-        driver.findElement(backButton).click();
+        driver.findElement(continueShoppingButton).click();
     }
 
     // ✔ Social icons (inventory page also has them)

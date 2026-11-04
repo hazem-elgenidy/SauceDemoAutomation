@@ -8,7 +8,8 @@ import java.nio.file.Path;
 
 public class DataDriven {
 
-    private static final String DEFAULT_PATH = "C:\\Users\\Admin\\IdeaProjects\\SauceDemoAutomation\\src\\test\\TestData.json";
+    // Relative to the project folder, so it works on any computer and in CI
+    private static final String DEFAULT_PATH = "src/test/TestData.json";
 
     /**
      * Reads the JSON file and returns the root JsonObject.
